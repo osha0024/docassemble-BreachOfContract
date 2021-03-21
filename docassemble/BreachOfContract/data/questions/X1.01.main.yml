@@ -1,0 +1,111 @@
+# X1 is the code base for the breach of contract app
+# used in 2021 Semester 1 (and maybe subsequent semesters
+# and other courses) as an assessable task
+#
+# This code contains part of the breach of contract app.
+# The code is an example to illustrate to students:
+# - complex programming
+# - use of if statements
+# - multiple files
+#
+# Students are set
+# completion of this code (ie: the 'Somebody didn't pay
+# me for work' branch) as an exercise.
+#
+# Students should
+# - test for the elements of contract according to contract law
+# - do so in easy to read language with a Fleish score of > 60
+
+---
+# This is a complex program.  We therefore split the code out 
+# into multiple files (see the B1.01 video for more info)
+include:
+  - X1.01.questions.yml
+  - X1.01.endpoints.yml
+---
+# We start off with a 'Welcome screen'.  Students should 
+# replace the boilerplate text with a meaningful explanation
+#
+# Note this question block is mandatory.  Good practice with
+# Docassemble is to have a few mandatory blocks as possible.  
+# Ideally, there should never be more than two - a welcome 
+# screen and a code block to drive the app.
+mandatory: True
+question: Breach of Contract App
+subquestion: |
+  This is the first or 'Welcome' screen that the user
+  sees when they run the app.  This screen should describe
+  what the app does to the user.
+
+  The screen may also need to include a disclaimer, particularly
+  as this app is providing legal advice.
+
+  The screen should contain a click-through agreement indicating
+  the user agrees to the disclaimer and any other terms before
+  proceeding.
+
+  The screen should also give the user the option to exit the
+  app at this point
+buttons:
+  - I agree and wish to continue: continue
+  - I do not agree and wish to exit: exit
+---
+# This code block controls the execution of the app.
+# The code block asks the work and payment questions
+# and then takes the user to the final screen.  You will
+# see that the final screen contains the logic that drives
+# most of the 'legal' part of the app ie: the code that
+# determines whether the user can sue or not.
+mandatory: True
+code: |
+  # Ask the initial questions
+  MJFsue_reason
+  # We need to split off here depending on what the user
+  # answered
+  if MJFsue_reason == 'MJFpromisor':
+    # Students will need to put logic in here
+    # for the promisor part of the code
+    pass
+  elif MJFsue_reason == 'MJFpromisee':
+    # This is right side of the flowchart.  Off we go!
+
+    # First we ask the prelimiary questions
+    MJFwork_requested
+    MJFpayment_agreed
+    
+    # Now we can implement contract law as code.  Contract law
+    # states that we can only have a contract if we have
+    # Offer and Acceptance AND consideration AND Agreement AND Capacity
+    # All four elements must be present in order for a contract to exist.
+    # Conversely, if any of the four is not present then there is not
+    # a contract.  
+    #
+    # This means we only need to ask questions until we find that one
+    # of those elements doesn't exist.  For example, if there was no
+    # consideration, there's no point asking about capacity or agreement.
+    # We do this using a set of AND operators.  A logical AND means
+    # both sides must be true.  If the left side of an AND is not true
+    # then python won't bother evaluating the right side.  If we have
+    # many ANDs joined together, python evaluates them left to right
+    # and stops as soon as it finds a False.  We can use this property
+    # to control how many questions we ask
+    if MJFcertainty == 'MJFagree_exact' and MJFconsideration == True and MJFcapacity == True:
+      MJFcontract_exists = True
+    else:
+      MJFcontract_exists = False
+
+    # Now we know whether there is a contract or not we can display
+    # the final screen that contains a result and an explanation of why
+    endpoints['final_screen']
+
+  else:
+    # We should never end up at this else statement as MJFsue_reason
+    # should only ever be one of the two values above.  But if we've
+    # made a typo or some other error, then this else part will be
+    # triggered.  That's useful to us as as it will explain what's
+    # gone wrong if we have made a typo or other error.  It'd be
+    # much harder to find otherwise.
+
+    error_message = 'Unknown value in MJFsue_reason: {}'.format(MJFsue_reason)
+    endpoints['error_screen']
+---

@@ -1,0 +1,90 @@
+# We put all the question block into this file.  We do 
+# this simply to be organised.  We want to separate the
+# actual questions we ask from the logic flow of the program
+# itself (which is in the main file).  That way it makes
+# the logic flow easier to identify as it's not
+# cluttered with questions
+#
+# NOTE:  This file should not contain any mandatory
+# question blocks
+---
+# Asks the initial question
+# We populate MJFsue_reason with 'MJFpromisee' or 'MJFpromisor'.
+# These strings are easier work with than the long-form answer
+# we display to the user.
+# Ref: https://docassemble.org/docs/fields.html#radio
+#
+question: Why do you want to sue?
+fields:
+  - no label: MJFsue_reason
+    datatype: radio
+    choices:
+      - I paid for work that wasn't done: MJFpromisee
+      - Someody didn't pay me for work that I did: MJFpromisor
+---
+# Stores the description of the work that was requested
+question: Describe the work you wanted done
+fields:
+  - no label: MJFwork_requested
+    datatype: area
+---
+# We ask the two payment questions in a single question block
+question: Payment
+fields:
+  - How much did you agree to pay for this work?: MJFpayment_agreed
+    datatype: currency
+    min: 0
+under: |
+  If you have not yet paid anything, just leave the default value of $0.00
+---
+# Test for Offer and Acceptance
+# This code is going to ask two questions to make sure that
+question: Did the other person agree to do this work?
+fields:
+  - no label: MJFcertainty
+    datatype: radio
+    choices:
+      - Yes. The other person agreed to do exactly this work: MJFagree_exact
+      - Yes. The other person agreed to do some of this work but there was other work that was not agreed to that wasn't done: MJFagree_inexact
+      - No. The other person did not agree to do this work or all of this work: MJFdisagree
+---
+# Test for Consideration (and Certainty)
+# Because this is a Yes/No answer we store the results as boolean (ie: True/False)
+# values.  For more information on booleans check out C2.01 video.
+question: Payment for the Work
+subquestion: |
+  Did you and the other person agree how much you would pay for the work?
+fields:
+  - no label: MJFconsideration
+    datatype: radio
+    choices:
+      - Yes, we agreed to pay ${ currency(MJFpayment_agreed) } for the work: True
+      - No, we never reached a firm agreement on how much I should pay: False
+---
+# Just to mix things up, we use a 'yesno' field to ask whether the other person
+# had capacity.  We are reducing 'capacity' in this app to just being an adult.
+# For the purposes of this app it's too complex to get into actual mental capacity.
+question: Who did you contract with?
+subquestion: |
+  Was the other person an adult?
+yesno: MJFcapacity
+---
+# Question to ask if there is a written contract
+question: Written Contract
+subquestion: |
+  A 'written contract' can mean a formal contract document.
+  It can also mean any emails, texts or messages you send
+  or receive about the contract.
+  If your
+  messages contain information about:
+
+  - what work was meant to be done
+  - how much was going to be paid for that work
+  - who was going to do the work and who was going to pay
+
+  Then those messages may be enough to be a 'written contract'.
+fields:
+  - Do you or the other person have a 'written contract'?: MJFwritten_contract
+    datatype: yesnoradio
+---
+

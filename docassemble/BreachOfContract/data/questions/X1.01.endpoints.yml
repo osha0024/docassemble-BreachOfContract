@@ -1,0 +1,120 @@
+# We keep all the endpoints and associated templates
+# in this file.
+---
+objects:
+  - endpoints: DADict
+---
+# Displays an error message
+event: endpoints['error_screen']
+question: Error
+subquestion: |
+  There was an error.  Message:
+
+  ` ${ error_message }`
+
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+# Final screen.
+#
+# This screen, most importantly, should tell the user
+# whether they can sue the other person for breach of
+# contract or not.  
+#
+# If they can't sue for breach of contract, then the 
+# screen should explain to them why can't and what they
+# can do.
+#
+# Finally, the screen explains that a written contract
+# is not important when it comes to determining whether
+# a contract exists or not.
+# We use the 'event' specifier to tell Docassemble this is
+# the final screen endpoint.  More information is at
+# https://docassemble.org/docs/questions.html#event
+event: endpoints['final_screen']
+question: Breach of Contract App
+subquestion: |
+  % if MJFcontract_exists:
+  ${ MJFcontract_exists_template }
+  % else:
+  ${ MJFnot_contract_exists_template }
+  % endif
+buttons:
+  - Restart: restart
+  - Exit: exit
+---
+# Text to display explaining that a written contract is not necessary
+# when suing for breach of contract.
+template: MJFwritten_contract_template
+content: |
+  **You do not need to write your contract down to prove you have a contract.**
+
+  Many people think they don't have a contract because they never signed anything.
+  However, the law doesn't work that way.  If you and someone else:
+
+  - promised to do some work; and
+  - promised to pay for that work
+
+  then you most likely have a contract, even though you never wrote anything down.
+
+  A written contract helps to work out exactly what those promises were, but 
+  it's not required in order for there to be a contract.  A written contract
+  is evidence of what you promised, but it's not required to prove the
+  promises ever existed.
+---
+# What to display if the app determines a contract exists.
+template: MJFcontract_exists_template
+content: |
+  Based on your responses, 
+  you **may be able to sue** for breach of contract.
+
+  You should seek legal advice.  Collect any evidence about the 
+  contract that you might have, such as text message, phone call logs,
+  diary entries and so-on.
+  % if MJFwritten_contract:
+  Be sure to include evidence of your written contract.
+  % else: 
+
+  ${ MJFwritten_contract_template }
+  % endif
+---
+# What to display it the app determines a contract doesn't exist.  This
+# template is quite a bit more complex than the exists template as 
+# we need to explain why the user can't sue.  The reasons why will
+# depend on the user's responses to any of the contract law questions
+# that we asked.
+template: MJFnot_contract_exists_template
+content: |
+  Based on your responses, you **may not be able to sue** for 
+  breach of contract.
+
+  You should still seek legal advice for a formal legal opinion.
+
+  Based on your responses:
+  
+  % if MJFcertainty != 'MJFagree_exact':
+  - You and the other person did not agree to do this work, or all of this work,
+    or there was other work done that was not agreed to.
+  % endif
+  % if not MJFconsideration:
+  - You never reached a firm agreement on how much to pay for the work done.
+  % endif
+  % if not MJFcapacity:
+  - The other person was under 18.  It is possible in some circumstances to enter into
+    a contract with people under 18.  You should seek legal advice about whether your
+    situation meets these circumstances.
+  % endif
+
+
+  In order for there to be a contract, you need to prove these things:
+
+  - That you and the other person agreed to the work to be done.
+  - That you and the other person agreed to how much you would pay for the work.
+  - That you and the other person are able to enter into a contract.  Usually this means you
+    both should be over 18 years old.  You need to seek legal advice if one or both of
+    you is under 18.
+
+  % if not MJFwritten_contract:
+  ${ MJFwritten_contract_template }
+  % endif
